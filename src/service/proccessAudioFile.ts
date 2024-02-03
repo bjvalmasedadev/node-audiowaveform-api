@@ -158,14 +158,17 @@ export async function generateWaveformDataFile(
     headerBuffer.writeInt32LE(sampleRate, 8); // Tasa de muestreo
     headerBuffer.writeInt32LE(samplesPerPixel, 12); // Muestras por píxel
     headerBuffer.writeUInt32LE(length, 16); // Longitud
-    headerBuffer.writeInt32LE(1, 20); // Canales
+    headerBuffer.writeInt32LE(channels, 20); // Canales
 
-    let dataBuffer: Buffer;
-    if (bits === 8) {
-      dataBuffer = Buffer.alloc(length * 2); // *2 por min/max
-    } else {
-      dataBuffer = Buffer.alloc(length * 4); // *4 para 16 bits (2 bytes por min y 2 por max)
+    // Calcula el tamaño correcto del dataBuffer basado en 'bits' y si los canales están separados
+    let dataSizePerChannel = length * 2; // *2 por min/max para cada punto
+    if (bits === 16) {
+      dataSizePerChannel *= 2; // *2 porque cada muestra de 16 bits necesita 2 bytes
     }
+
+    // Multiplica por el número de canales si los canales están separados
+    let totalDataSize = dataSizePerChannel * (splitChannels ? channels : 1);
+    let dataBuffer = Buffer.alloc(totalDataSize);
 
     let bufferIndex = 0;
 
