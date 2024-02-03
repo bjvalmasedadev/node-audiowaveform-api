@@ -18,12 +18,12 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/api/process-audio", async (req: Request, res: Response) => {
-  const filePath = "/Users/bjvalmaseda/audio.mp3";
+  const filePath = "/Users/bjvalmaseda/audio2.mp3";
 
   try {
     const buffer = await readFileAsBuffer(filePath);
     //const peaks = await processAudioBufferToWaveformData(buffer, 100, 8, true);
-    const dat = await generateWaveformDataFile(buffer, 100);
+    const dat = await generateWaveformDataFile(buffer, 512, true);
 
     res.writeHead(200, {
       "Content-Type": "application/octet-stream",
