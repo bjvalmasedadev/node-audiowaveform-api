@@ -1,5 +1,7 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
+import path from "node:path";
+import { fileURLToPath } from "url";
 import {
   generateWaveformDataFile,
   generateWaveformJSON,
@@ -7,6 +9,9 @@ import {
 } from "./service/proccessAudioFile.js";
 import { readFileAsBuffer } from "./utils.js";
 // import { readFileAsBuffer } from "./utils";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -16,10 +21,17 @@ const PORT = process.env.PORT || 3000;
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World");
 });
+app.use("/static", express.static(path.join(__dirname, "../public")));
+app.use(express.json());
 
 app.get("/api/process-audio", async (req: Request, res: Response) => {
-  const filePath = "/Users/bjvalmaseda/audio2.mp3";
+  const fileName = req.query.fileName;
 
+  if (!fileName) {
+    res.status(400).json({ message: "fileName is required" });
+    return;
+  }
+  const filePath = path.join(__dirname, "../public", fileName as string);
   try {
     const buffer = await readFileAsBuffer(filePath);
     //const peaks = await processAudioBufferToWaveformData(buffer, 100, 8, true);
