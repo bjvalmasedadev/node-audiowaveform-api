@@ -1,14 +1,13 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
 import path from "node:path";
-import { fileURLToPath } from "url";
-import {
-  generateWaveformDataFile,
-  generateWaveformJSON,
-  processAudioBufferToWaveformData,
-} from "./service/proccessAudioFile.js";
+import { RegisterRoutes } from "./../build/routes.js";
+import swaggerJson from "./../build/swagger.json" assert { type: "json" };
+import { generateWaveformDataFile } from "./service/proccessAudioFile.js";
 import { readFileAsBuffer } from "./utils.js";
-// import { readFileAsBuffer } from "./utils";
+
+import swaggerUi from "swagger-ui-express";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,11 +17,13 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World");
-});
 app.use("/static", express.static(path.join(__dirname, "../public")));
 app.use(express.json());
+RegisterRoutes(app);
+
+app.use("/docs", swaggerUi.serve, async (_req: Request, res: Response) => {
+  return res.send(swaggerUi.generateHTML(swaggerJson));
+});
 
 app.get("/api/process-audio", async (req: Request, res: Response) => {
   const fileName = req.query.fileName;
@@ -49,21 +50,21 @@ app.get("/api/process-audio", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/api/process-audio-json", async (req: Request, res: Response) => {
-  const filePath = "/Users/bjvalmaseda/audio.mp3";
+// app.get("/api/process-audio-json", async (req: Request, res: Response) => {
+//   const filePath = "/Users/bjvalmaseda/audio.mp3";
 
-  try {
-    const buffer = await readFileAsBuffer(filePath);
-    const peaks = await processAudioBufferToWaveformData(buffer, 512, 8);
-    const json = generateWaveformJSON(peaks);
+//   try {
+//     const buffer = await readFileAsBuffer(filePath);
+//     const peaks = await processAudioBufferToWaveformData(buffer, 512, 8);
+//     const json = generateWaveformJSON(peaks);
 
-    res.json(json);
-  } catch (e: any) {
-    console.error(e);
-    res.status(500).json({ message: e.message });
-    return;
-  }
-});
+//     res.json(json);
+//   } catch (e: any) {
+//     console.error(e);
+//     res.status(500).json({ message: e.message });
+//     return;
+//   }
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);

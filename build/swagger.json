@@ -1,0 +1,83 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "api-waveform",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {
+			"name": "Barbaro Javier"
+		}
+	},
+	"paths": {
+		"/audio-processor/process-audio": {
+			"get": {
+				"operationId": "ProcessAudio",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"file": {
+											"type": "string",
+											"format": "byte"
+										}
+									},
+									"required": [
+										"file"
+									],
+									"type": "object"
+								}
+							}
+						},
+						"headers": {
+							"Content-Disposition": {
+								"schema": {
+									"type": "string"
+								},
+								"required": true
+							},
+							"Content-Type": {
+								"schema": {
+									"type": "string"
+								},
+								"required": true
+							}
+						}
+					},
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "fileName",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
